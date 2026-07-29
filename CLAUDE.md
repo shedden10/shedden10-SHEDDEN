@@ -16,7 +16,7 @@ folder.
 
 ## Live deployment
 
-- **App:** TODO — paste your Worker's workers.dev URL here once deployed
+- **App:** https://xml.realifecr.workers.dev
 - **Cloudflare Worker:** `xml` (account `c0a7f7c1acd5ecea04f18cb1087fe3a0`)
 - **D1 database:** `db` (`3aa489d6-f947-4714-be41-6187f987c0e6`)
 - **KV (Astro sessions):** `SESSION` (`da28ae92ba494473833f606785043fbe`)
