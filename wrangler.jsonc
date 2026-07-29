@@ -8,7 +8,7 @@
   },
   // Bindings are pinned by id so Cloudflare reuses these existing resources
   // instead of trying to auto-provision (re-create) them on each deploy.
-  "kv_namespaces": [{ "binding": "SESSION", "id": "45ae82c006684626bb5fb721799de4ea" }],
+  "kv_namespaces": [{ "binding": "SESSION", "id": "da28ae92ba494473833f606785043fbe" }],
   "d1_databases": [
     {
       "binding": "DB",

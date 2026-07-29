@@ -16,15 +16,16 @@ folder.
 
 ## Live deployment
 
-- **App:** https://xml.showyouhow83.workers.dev
-- **Cloudflare Worker:** `xml` (account `f2cb7f9c07dd4587efbd7772ff8e324f`)
+- **App:** TODO — paste your Worker's workers.dev URL here once deployed
+- **Cloudflare Worker:** `xml` (account `c0a7f7c1acd5ecea04f18cb1087fe3a0`)
 - **D1 database:** `db` (`3aa489d6-f947-4714-be41-6187f987c0e6`)
-- **KV (Astro sessions):** `SESSION` (`45ae82c006684626bb5fb721799de4ea`)
+- **KV (Astro sessions):** `SESSION` (`da28ae92ba494473833f606785043fbe`)
 - **R2 bucket (invoice PDFs):** `xml-pdfs` (binding `PDFS`) — raw PDF bytes live
   here, not base64 in D1, grouped into a **folder per mailbox**
   (`<mailbox-email>/<clave>.pdf`) so each client's PDFs sit together. Create it
   once: `wrangler r2 bucket create xml-pdfs`.
-- **Repo:** github.com/showyouhow83/XML (default branch `main`)
+- **Repo:** github.com/shedden10/SHEDDEN (default branch `main`, forked from
+  github.com/showyouhow83/XML)
 - **Deploy:** push to `main` → Cloudflare **Workers Builds** auto-builds & deploys
   (`npm run build` then `wrangler deploy`). No manual deploy step.
 
