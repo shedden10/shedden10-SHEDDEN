@@ -18,7 +18,7 @@ folder.
 
 - **App:** https://xml.showyouhow83.workers.dev
 - **Cloudflare Worker:** `xml` (account `f2cb7f9c07dd4587efbd7772ff8e324f`)
-- **D1 database:** `xml-db` (`c067759f-d1ee-44d8-8987-da4ff0ffd01f`)
+- **D1 database:** `db` (`3aa489d6-f947-4714-be41-6187f987c0e6`)
 - **KV (Astro sessions):** `SESSION` (`45ae82c006684626bb5fb721799de4ea`)
 - **R2 bucket (invoice PDFs):** `xml-pdfs` (binding `PDFS`) — raw PDF bytes live
   here, not base64 in D1, grouped into a **folder per mailbox**
@@ -181,6 +181,14 @@ Later:
 
 ## Changelog (newest first)
 
+- **#31** **Switched D1 database to `db`** — the Worker's D1 binding now points at
+  a new, empty database (`db`, `3aa489d6-f947-4714-be41-6187f987c0e6`) instead of
+  the original `xml-db` (`c067759f-d1ee-44d8-8987-da4ff0ffd01f`), which still
+  exists with all prior data but is no longer bound to the app. This was an
+  intentional fresh start, not a migration — no data was copied. After this
+  deploys, the dashboard will show no invoices until the collector runs against
+  the new (empty) database; the schema must be applied to it first (`npx wrangler
+  d1 migrations apply db --remote`).
 - **#30** **Mailboxes show real receipt coverage (not the search window)** — the
   Mailboxes table’s **“Covers back to”** column showed `synced_from` (the date the
   collector last *searched* back to), which is confusing — it doesn’t say how far
