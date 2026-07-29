@@ -16,15 +16,16 @@ folder.
 
 ## Live deployment
 
-- **App:** https://xml.showyouhow83.workers.dev
-- **Cloudflare Worker:** `xml` (account `f2cb7f9c07dd4587efbd7772ff8e324f`)
-- **D1 database:** `xml-db` (`c067759f-d1ee-44d8-8987-da4ff0ffd01f`)
-- **KV (Astro sessions):** `SESSION` (`45ae82c006684626bb5fb721799de4ea`)
+- **App:** https://xml.realifecr.workers.dev
+- **Cloudflare Worker:** `xml` (account `c0a7f7c1acd5ecea04f18cb1087fe3a0`)
+- **D1 database:** `db` (`3aa489d6-f947-4714-be41-6187f987c0e6`)
+- **KV (Astro sessions):** `SESSION` (`da28ae92ba494473833f606785043fbe`)
 - **R2 bucket (invoice PDFs):** `xml-pdfs` (binding `PDFS`) — raw PDF bytes live
   here, not base64 in D1, grouped into a **folder per mailbox**
   (`<mailbox-email>/<clave>.pdf`) so each client's PDFs sit together. Create it
   once: `wrangler r2 bucket create xml-pdfs`.
-- **Repo:** github.com/showyouhow83/XML (default branch `main`)
+- **Repo:** github.com/shedden10/SHEDDEN (default branch `main`, forked from
+  github.com/showyouhow83/XML)
 - **Deploy:** push to `main` → Cloudflare **Workers Builds** auto-builds & deploys
   (`npm run build` then `wrangler deploy`). No manual deploy step.
 
@@ -181,6 +182,14 @@ Later:
 
 ## Changelog (newest first)
 
+- **#31** **Switched D1 database to `db`** — the Worker's D1 binding now points at
+  a new, empty database (`db`, `3aa489d6-f947-4714-be41-6187f987c0e6`) instead of
+  the original `xml-db` (`c067759f-d1ee-44d8-8987-da4ff0ffd01f`), which still
+  exists with all prior data but is no longer bound to the app. This was an
+  intentional fresh start, not a migration — no data was copied. After this
+  deploys, the dashboard will show no invoices until the collector runs against
+  the new (empty) database; the schema must be applied to it first (`npx wrangler
+  d1 migrations apply db --remote`).
 - **#30** **Mailboxes show real receipt coverage (not the search window)** — the
   Mailboxes table’s **“Covers back to”** column showed `synced_from` (the date the
   collector last *searched* back to), which is confusing — it doesn’t say how far
