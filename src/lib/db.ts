@@ -603,7 +603,7 @@ export async function groupByIssuer(db: D1Database, f: InvoiceFilters): Promise<
   return results ?? [];
 }
 
-/** Full rows for CSV export (respects filters, ignores pagination). */
+/** Full rows for Excel export (respects filters, ignores pagination). */
 export async function exportRows(db: D1Database, f: InvoiceFilters) {
   const { sql: where, binds } = buildWhere(f);
   const col = SORT_COLUMNS[f.sort ?? 'fecha'] ?? 'fecha_emision';

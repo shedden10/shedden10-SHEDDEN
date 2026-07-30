@@ -91,7 +91,7 @@ const gated = Boolean(env.APP_PASSWORD);
           setTimeout(function () { btn.disabled = true; }, 0);
         }, false);
 
-        // Download / file links (XML, PDF, per-mailbox zip, CSV export) navigate to
+        // Download / file links (XML, PDF, per-mailbox zip, Excel export) navigate to
         // an API route but don't reload the page, so nothing signals the click. Show
         // a brief spinner to acknowledge it, then clear it (there's no load event).
         document.addEventListener('click', function (e) {

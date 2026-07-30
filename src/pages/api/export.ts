@@ -1,12 +1,7 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { ensureSchema, exportRows, type InvoiceFilters } from '../../lib/db';
-
-function csvCell(v: unknown): string {
-  if (v == null) return '';
-  const s = String(v);
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
+import { rowsToXlsxZip, XLSX_CONTENT_TYPE } from '../../lib/xlsx';
 
 export const GET: APIRoute = async ({ url }) => {
   await ensureSchema(env.DB);
@@ -33,14 +28,11 @@ export const GET: APIRoute = async ({ url }) => {
     'total_exonerado', 'total_descuentos', 'total_venta_neta', 'total_impuesto',
     'total_otros_cargos', 'total_comprobante', 'source_account', 'has_pdf',
   ];
-  const lines = [headers.join(',')];
-  for (const r of rows) lines.push(headers.map((h) => csvCell((r as any)[h])).join(','));
-  const csv = '﻿' + lines.join('\r\n'); // BOM so Excel reads UTF-8
-
-  return new Response(csv, {
+  const zip = rowsToXlsxZip(headers, rows as unknown as Record<string, unknown>[]);
+  return new Response(zip.body, {
     headers: {
-      'content-type': 'text/csv; charset=utf-8',
-      'content-disposition': `attachment; filename="invoices-${new Date().toISOString().slice(0, 10)}.csv"`,
+      'content-type': XLSX_CONTENT_TYPE,
+      'content-disposition': `attachment; filename="invoices-${new Date().toISOString().slice(0, 10)}.xlsx"`,
     },
   });
 };

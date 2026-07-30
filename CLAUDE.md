@@ -182,6 +182,17 @@ Later:
 
 ## Changelog (newest first)
 
+- **#32** **Exports switched from CSV to Excel (.xlsx)** — both the dashboard's
+  **Export** button (`/api/export`) and Ivan's **⬇ Exportar** button on any answer
+  with rows (`/api/ask-export`) now download a real `.xlsx` workbook instead of a
+  CSV, with a bold header row. Built with a small hand-rolled OOXML writer
+  (`src/lib/xlsx.ts`) on top of the `client-zip` dependency already used for the
+  PDF/XML zips, instead of pulling in the `xlsx` (SheetJS) npm package — its
+  published release carries known ReDoS / prototype-pollution CVEs in its parsing
+  code, which we don't need since we only ever *write* sheets from data we already
+  trust. Verified by round-tripping the generated file through `openpyxl` (special
+  characters, `null`, embedded newlines, and the bold header style all came back
+  correctly).
 - **#31** **Switched D1 database to `db`** — the Worker's D1 binding now points at
   a new, empty database (`db`, `3aa489d6-f947-4714-be41-6187f987c0e6`) instead of
   the original `xml-db` (`c067759f-d1ee-44d8-8987-da4ff0ffd01f`), which still

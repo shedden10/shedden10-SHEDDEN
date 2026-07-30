@@ -2,19 +2,14 @@ import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { ensureSchema } from '../../lib/db';
 import { validateReadonlySelect } from '../../lib/ai';
+import { rowsToXlsxZip, XLSX_CONTENT_TYPE } from '../../lib/xlsx';
 
 export const prerender = false;
 
-function csvCell(v: unknown): string {
-  if (v == null) return '';
-  const s = String(v);
-  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
-
-// Export the rows behind an Ivan answer as CSV. The client posts the SQL Ivan
-// generated; we re-validate it as a single read-only SELECT over `invoices`
-// (same guard as /api/ask — no new exposure) and stream the full result (≤500).
-// Session-gated by middleware.
+// Export the rows behind an Ivan answer as an .xlsx. The client posts the SQL
+// Ivan generated; we re-validate it as a single read-only SELECT over
+// `invoices` (same guard as /api/ask — no new exposure) and stream the full
+// result (≤500). Session-gated by middleware.
 export const POST: APIRoute = async ({ request }) => {
   let body: any;
   try {
@@ -37,14 +32,11 @@ export const POST: APIRoute = async ({ request }) => {
   if (!rows.length) return new Response('No rows to export', { status: 404 });
 
   const headers = Object.keys(rows[0]);
-  const lines = [headers.join(',')];
-  for (const r of rows) lines.push(headers.map((h) => csvCell(r[h])).join(','));
-  const csv = '﻿' + lines.join('\r\n'); // BOM so Excel reads UTF-8
-
-  return new Response(csv, {
+  const zip = rowsToXlsxZip(headers, rows);
+  return new Response(zip.body, {
     headers: {
-      'content-type': 'text/csv; charset=utf-8',
-      'content-disposition': `attachment; filename="ivan-datos-${new Date().toISOString().slice(0, 10)}.csv"`,
+      'content-type': XLSX_CONTENT_TYPE,
+      'content-disposition': `attachment; filename="ivan-datos-${new Date().toISOString().slice(0, 10)}.xlsx"`,
     },
   });
 };
