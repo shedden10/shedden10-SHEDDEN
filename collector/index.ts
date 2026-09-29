@@ -32,7 +32,7 @@ import { isDue, localDate } from '../src/lib/schedule.ts';
 const here = dirname(fileURLToPath(import.meta.url));
 
 const APP_URL = (process.env.APP_URL || '').replace(/\/$/, '');
-const INGEST_TOKEN = process.env.INGEST_TOKEN || '';
+const INGEST_TOKEN = (process.env.INGEST_TOKEN || '').trim();
 const CONCURRENCY = Math.max(1, Number(process.env.CONCURRENCY || 5));
 const LOOKBACK_OVERRIDE = process.env.LOOKBACK_DAYS ? Number(process.env.LOOKBACK_DAYS) : undefined;
 const DRY_RUN = process.argv.includes('--dry-run') || process.env.DRY_RUN === '1';
@@ -82,6 +82,18 @@ async function loadMailboxes(): Promise<Mailbox[]> {
   const res = await fetch(`${APP_URL}/api/collector/mailboxes`, {
     headers: { authorization: `Bearer ${INGEST_TOKEN}` },
   });
+  if (res.status === 401) {
+    const raw = process.env.INGEST_TOKEN || '';
+    fail(
+      `Failed to fetch mailboxes: 401 ${await res.text()}\n` +
+        `  The INGEST_TOKEN repo secret (Settings → Secrets → Actions) is not the same value as the\n` +
+        `  Worker's INGEST_TOKEN secret (npx wrangler secret put INGEST_TOKEN). Re-enter the same string in both.\n` +
+        `  Token seen here: ${raw.length} chars` +
+        (raw !== raw.trim() ? ', has leading/trailing whitespace' : '') +
+        (/^["']|["']$/.test(raw) ? ', wrapped in quotes' : '') +
+        `.`
+    );
+  }
   if (!res.ok) fail(`Failed to fetch mailboxes: ${res.status} ${await res.text()}`);
   const body = (await res.json()) as { mailboxes: Mailbox[] };
   return body.mailboxes || [];
