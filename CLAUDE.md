@@ -182,6 +182,13 @@ Later:
 
 ## Changelog (newest first)
 
+- **#33** **Ingest auth: tolerate pasted whitespace + explain 401s** — the Worker
+  now `trim()`s its `INGEST_TOKEN` before comparing (a trailing newline/space
+  pasted into the secret from a Windows shell used to fail every collector call),
+  the collector trims its copy too, and on a 401 it prints *why*: that the repo's
+  `INGEST_TOKEN` Actions secret differs from the Worker's, plus the length of the
+  token it sent and whether it carries whitespace or quotes — so a mismatch can be
+  diagnosed from the Actions log alone. The Worker's 401 body says the same.
 - **#32** **Fix “Collect now” dispatch target** — the Worker's `GITHUB_REPO` var
   pointed at `shedden10/SHEDDEN`, but the fork actually lives at
   `shedden10/shedden10-SHEDDEN`, so every dashboard-triggered dispatch went to a

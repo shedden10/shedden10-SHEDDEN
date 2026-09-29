@@ -10,11 +10,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Collector endpoints authenticate with a bearer token, bypassing the UI gate.
   if (path.startsWith('/api/collector/')) {
-    if (!env.INGEST_TOKEN) {
+    // Trim so a stray newline/space pasted into the secret (common when the value
+    // is piped in from a Windows shell) doesn't break the comparison.
+    const expected = (env.INGEST_TOKEN ?? '').trim();
+    if (!expected) {
       return new Response('INGEST_TOKEN is not configured', { status: 503 });
     }
-    if (!safeEqual(bearerToken(request), env.INGEST_TOKEN)) {
-      return new Response('Unauthorized', { status: 401 });
+    if (!safeEqual(bearerToken(request), expected)) {
+      return new Response(
+        'Unauthorized: the bearer token does not match the Worker\'s INGEST_TOKEN secret',
+        { status: 401 }
+      );
     }
     return next();
   }
