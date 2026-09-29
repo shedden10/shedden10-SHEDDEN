@@ -24,7 +24,7 @@ folder.
   here, not base64 in D1, grouped into a **folder per mailbox**
   (`<mailbox-email>/<clave>.pdf`) so each client's PDFs sit together. Create it
   once: `wrangler r2 bucket create xml-pdfs`.
-- **Repo:** github.com/shedden10/SHEDDEN (default branch `main`, forked from
+- **Repo:** github.com/shedden10/shedden10-SHEDDEN (default branch `main`, forked from
   github.com/showyouhow83/XML)
 - **Deploy:** push to `main` → Cloudflare **Workers Builds** auto-builds & deploys
   (`npm run build` then `wrangler deploy`). No manual deploy step.
@@ -102,7 +102,7 @@ Worker (Cloudflare → `xml` → Settings → Variables and Secrets):
   fall back to Opus for that step; the code default is Opus.
 
 GitHub repo → Settings → Secrets → Actions:
-- `APP_URL` = https://xml.showyouhow83.workers.dev
+- `APP_URL` = https://xml.realifecr.workers.dev
 - `INGEST_TOKEN` = same value as the Worker's.
 
 ## Current state (works today)
@@ -182,6 +182,16 @@ Later:
 
 ## Changelog (newest first)
 
+- **#32** **Fix “Collect now” dispatch target** — the Worker's `GITHUB_REPO` var
+  pointed at `shedden10/SHEDDEN`, but the fork actually lives at
+  `shedden10/shedden10-SHEDDEN`, so every dashboard-triggered dispatch went to a
+  repo that doesn't exist (GitHub 404 → “Couldn't start collection”). Corrected
+  the var in `wrangler.jsonc` and the repo/`APP_URL` references in this doc.
+  Reminder for the fork: GitHub **Actions secrets are not inherited** from the
+  upstream repo — `APP_URL` and `INGEST_TOKEN` must be added to
+  `shedden10/shedden10-SHEDDEN` → Settings → Secrets → Actions, and the
+  `GH_DISPATCH_TOKEN` fine-grained token must grant Actions read/write on
+  **that** repo.
 - **#31** **Switched D1 database to `db`** — the Worker's D1 binding now points at
   a new, empty database (`db`, `3aa489d6-f947-4714-be41-6187f987c0e6`) instead of
   the original `xml-db` (`c067759f-d1ee-44d8-8987-da4ff0ffd01f`), which still
